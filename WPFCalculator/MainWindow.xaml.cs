@@ -17,7 +17,7 @@ namespace WPFCalculator
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow
+	public partial class MainWindow : Window
 	{
 		public MainWindow()
 		{
@@ -107,8 +107,8 @@ namespace WPFCalculator
 
 		private void DotButtonClicked(object sender, RoutedEventArgs e)
 		{
-			if (txt.Content.ToString() != "" && !txt.Content.ToString().Contains(','))
-				txt.Content += ",";
+			if (txt.Content.ToString() != "" && !txt.Content.ToString().Contains('.'))
+				txt.Content += ".";
 		}
 		public char? Operator { get; set; }
 		public double? NumberOne { get; set; } = null;
@@ -146,7 +146,7 @@ namespace WPFCalculator
 								NumberOne *= Convert.ToDouble(txt.Content.ToString());
 								break;
 							case '÷':
-								if (NumberOne.ToString()[0] == '0')
+								if (NumberOne.ToString()[0] == '0' && NumberOne.ToString().Length == 1)
 								{
 									MessageBox.Show("You Cant Divide Zero");
 								}
@@ -164,7 +164,7 @@ namespace WPFCalculator
 						Operator = btn.Content.ToString()[0];
 						label2.Content = Operator;
 						NumberOne = Convert.ToDouble(txt.Content.ToString());
-						if (NumberOne.ToString().StartsWith("0") && Operator != '-' && Operator != '+')
+						if (NumberOne.ToString().StartsWith("0") && Operator != '-' && Operator != '+' && NumberOne.ToString().Length == 1)
 						{
 							Operator = null;
 							label1.Content = "";
@@ -185,7 +185,7 @@ namespace WPFCalculator
 
 		private void Button_Click_2(object sender, RoutedEventArgs e)
 		{
-			if (!string.IsNullOrWhiteSpace(txt.Content.ToString()))
+			if (!string.IsNullOrWhiteSpace(txt.Content?.ToString()))
 			{
 				switch (Operator)
 				{
@@ -199,7 +199,12 @@ namespace WPFCalculator
 						txt.Content = (NumberOne * Convert.ToDouble(txt.Content.ToString())).ToString();
 						break;
 					case '÷':
-						txt.Content = (NumberOne / Convert.ToDouble(txt.Content.ToString())).ToString();
+						if (txt.Content.ToString()[0] == '0' && txt.Content.ToString().Length == 1)
+						{
+							txt.Content = "Cannot Divide By Zero";
+						}
+						else
+							txt.Content = (NumberOne / Convert.ToDouble(txt.Content.ToString())).ToString();
 						break;
 				}
 				NumberOne = null;
@@ -219,7 +224,7 @@ namespace WPFCalculator
 
 		private void MainGrid_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (Keyboard.Modifiers==ModifierKeys.Shift && e.Key == Key.D8 )
+			if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key == Key.D8)
 				OperatorButtonsClicked(btnMulti, null);
 			else if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key == Key.OemPlus)
 				OperatorButtonsClicked(btnPlus, null);
@@ -231,30 +236,101 @@ namespace WPFCalculator
 				Button_Click_2(null, null);
 			else if (e.Key == Key.OemPeriod)
 				DotButtonClicked(btnDot, null);
-			else if (e.Key == Key.D1)
+			else if (e.Key == Key.D0 || e.Key == Key.NumPad0)
+				NumberButton_Click(btn0, null);
+			else if (e.Key == Key.D1 || e.Key == Key.NumPad1)
 				NumberButton_Click(btn1, null);
-			else if (e.Key == Key.D2)
+			else if (e.Key == Key.D2 || e.Key == Key.NumPad2)
 				NumberButton_Click(btn2, null);
-			else if (e.Key == Key.D3)
+			else if (e.Key == Key.D3 || e.Key == Key.NumPad3)
 				NumberButton_Click(btn3, null);
-			else if (e.Key == Key.D4)
+			else if (e.Key == Key.D4 || e.Key == Key.NumPad4)
 				NumberButton_Click(btn4, null);
-			else if (e.Key == Key.D5)
+			else if (e.Key == Key.D5 || e.Key == Key.NumPad5)
 				NumberButton_Click(btn5, null);
-			else if (e.Key == Key.D6)
+			else if (e.Key == Key.D6 || e.Key == Key.NumPad6)
 				NumberButton_Click(btn6, null);
-			else if (e.Key == Key.D7)
+			else if (e.Key == Key.D7 || e.Key == Key.NumPad7)
 				NumberButton_Click(btn7, null);
-			else if (e.Key == Key.D8)
+			else if (e.Key == Key.D8 || e.Key == Key.NumPad8)
 				NumberButton_Click(btn8, null);
-			else if (e.Key == Key.D9)
+			else if (e.Key == Key.D9 || e.Key == Key.NumPad9)
 				NumberButton_Click(btn9, null);
 			else if (e.Key == Key.Back)
 				BackSpaceButton(null, null);
 			else if (e.Key == Key.C)
 				ClearButtonClicked(null, null);
+			else if (e.Key == Key.Enter)
+				Button_Click_2(null, null);
+		}
+		private void Button_Click_3(object sender, RoutedEventArgs e)
+		{
+			Application.Current.Shutdown();
+		}
 
+		private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+		{
+			DragMove();
+		}
+		public bool IsMaximazed { get; set; } = true;
+		private void Button_Click_4(object sender, RoutedEventArgs e)
+		{
+			if (IsMaximazed)
+			{
+				WindowState = WindowState.Maximized;
+				IsMaximazed = false;
+			}
+			else
+			{
+				WindowState = WindowState.Normal;
+				IsMaximazed = true;
 
+			}
+
+		}
+
+		private void Button_Click_5(object sender, RoutedEventArgs e)
+		{
+			WindowState = WindowState.Minimized;
+		}
+
+		private void Button_Click_6(object sender, RoutedEventArgs e)
+		{
+			if (!string.IsNullOrWhiteSpace(txt.Content?.ToString()))
+			{
+				var temp = Convert.ToDouble(txt.Content.ToString());
+				txt.Content = $"{temp * temp}";
+			}
+		}
+
+		private void Button_Click_7(object sender, RoutedEventArgs e)
+		{
+			if (!string.IsNullOrWhiteSpace(txt.Content?.ToString()))
+			{
+				var temp = Convert.ToDouble(txt.Content.ToString());
+				txt.Content = Math.Sqrt(temp).ToString();
+			}
+		}
+
+		private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			var temp = Height - 20;
+
+			var temp2 = Math.Round(temp / 10);
+			if (temp2 > 100)
+			{
+				txt.FontSize = 100;
+				label1.FontSize = 100 / 3;
+				label2.FontSize = 100 / 3;
+				label1.Margin = new Thickness(0, 0, 30, 0);
+			}
+			else
+			{
+				txt.FontSize = temp2;
+				label1.FontSize = temp2 / 3;
+				label2.FontSize = temp2 / 3;
+				label1.Margin = new Thickness(0, 0, temp2 / 2.6, 0);
+			}
 		}
 	}
 }
